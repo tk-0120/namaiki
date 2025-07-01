@@ -75,7 +75,7 @@ async function initializeViewer(password) {
         // イベント委譲でボタンのクリックを処理
         $magazine.on('click', '.review-button', function(event) {
             event.stopPropagation(); // turn.jsへのイベント伝播を停止
-            window.location.href = 'https://tk-0120.github.io/namaiki/survay.html';
+            window.location.href = 'https://tk-0120.github.io/namaiki/survey.html';
         });
 
         $loader.addClass('hidden');
