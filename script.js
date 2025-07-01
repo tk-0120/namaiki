@@ -69,7 +69,8 @@ async function initializeViewer(password) {
         const $button = $('<button>')
             .addClass('review-button')
             .text('感想を書く')
-            .on('click', function() {
+            .on('click', function(event) {
+                event.stopPropagation();
                 window.location.href = 'https://tk-0120.github.io/namaiki/survey.html';
             });
         $reviewPage.append($paragraph).append($button);
