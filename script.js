@@ -71,7 +71,7 @@ async function initializeViewer(password) {
             .text('感想を書く')
             .on('click', function(event) {
                 event.stopPropagation();
-                window.location.href = 'https://tk-0120.github.io/namaiki/survey.html';
+                window.location.href = 'https://tk-0120.github.io/namaiki/survay.html';
             });
         $reviewPage.append($paragraph).append($button);
         $magazine.append($reviewPage);
