@@ -64,7 +64,7 @@ async function initializeViewer(password) {
             $magazine.append($pageElement);
         }
 
-        const $reviewPage = $('<div>').addClass('review-page');
+        const $reviewPage = $('<div>').addClass('review-page no-touch');
         const $paragraph = $('<p>').text('商品の感想を教えてください！');
         const $button = $('<button>')
             .addClass('review-button')
