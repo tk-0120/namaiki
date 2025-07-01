@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Manga</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="title">Free Manga</div>
+    <div id="loader" class="hidden">読み込み中...</div>
+    <div id="container" class="hidden">
+        <div id="prev-button" class="nav-button">←</div>
+        <div id="magazine"></div>
+        <div id="next-button" class="nav-button">→</div>
+    </div>
+    <div id="page-numbers" class="hidden">
+        <span id="left-page"></span>
+        <span id="right-page"></span>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="turn.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
