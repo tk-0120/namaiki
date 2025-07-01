@@ -55,6 +55,21 @@ body {
     text-align: center;
     background: #f8f8f8;
     padding: 20px;
+    pointer-events: auto; /* クリックイベントを有効にする */
+    z-index: 999; /* 他の要素より手前に表示 */
+}
+
+.review-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 18px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    pointer-events: auto; /* クリックイベントを有効にする */
+    z-index: 1000; /* ボタンをさらに手前に */
 }
 
 .review-button {
