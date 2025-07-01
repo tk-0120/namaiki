@@ -68,13 +68,15 @@ async function initializeViewer(password) {
         const $paragraph = $('<p>').text('商品の感想を教えてください！');
         const $button = $('<button>')
             .addClass('review-button')
-            .text('感想を書く')
-            .on('click', function(event) {
-                event.stopPropagation();
-                window.location.href = 'https://tk-0120.github.io/namaiki/survay.html';
-            });
+            .text('感想を書く'); // 直接イベントを割り当てない
         $reviewPage.append($paragraph).append($button);
         $magazine.append($reviewPage);
+
+        // イベント委譲でボタンのクリックを処理
+        $magazine.on('click', '.review-button', function(event) {
+            event.stopPropagation(); // turn.jsへのイベント伝播を停止
+            window.location.href = 'https://tk-0120.github.io/namaiki/survay.html';
+        });
 
         $loader.addClass('hidden');
         $title.removeClass('hidden');
