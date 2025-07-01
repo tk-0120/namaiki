@@ -18,7 +18,6 @@ function updatePageNumbers(view) {
 }
 
 function setupTurnJs() {
-    // Check if turn.js is already initialized in a more robust way
     if ($magazine.data('turn')) {
         $magazine.turn('destroy');
     }
@@ -93,7 +92,7 @@ async function initializeViewer(password) {
         } else if (err && err.name) {
             errorMessage = `エラー種別: ${err.name}`;
         }
-        alert(`PDFの読み込みに失敗しました.\n\n理由: ${errorMessage}`);
+        alert(`PDFの読み込みに失敗しました。\n\n理由: ${errorMessage}`);
     }
 }
 
