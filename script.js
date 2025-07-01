@@ -65,9 +65,16 @@ async function initializeViewer(password) {
             $magazine.append($pageElement);
         }
 
-        const $reviewPage = $('<div>')
-            .addClass('review-page')
-            .html('<p>商品の感想を教えてください！</p><button class="review-button" onclick="window.location.href='https://tk-0120.github.io/namaiki/survey.html'">感想を書く</button>');
+        // 最終ページ（感想ページ）を安全な方法で作成
+        const $reviewPage = $('<div>').addClass('review-page');
+        const $paragraph = $('<p>').text('商品の感想を教えてください！');
+        const $button = $('<button>')
+            .addClass('review-button')
+            .text('感想を書く')
+            .on('click', function() {
+                window.location.href = 'https://tk-0120.github.io/namaiki/survey.html';
+            });
+        $reviewPage.append($paragraph).append($button);
         $magazine.append($reviewPage);
 
         $loader.addClass('hidden');
