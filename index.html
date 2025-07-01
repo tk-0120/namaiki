@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>電子書籍</title>
+
+    <!-- jQuery & Turn.js -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
+
+    <style>
+        body {
+            background: #ccc;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        #container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #magazine {
+            position: relative;
+        }
+
+        #magazine .turn-page {
+            background-color: #fff;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* 最終ページ（商品の感想） */
+        .review-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: #f8f8f8;
+            padding: 20px;
+        }
+
+        .review-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .review-button:hover {
+            background: #0056b3;
+        }
+
+        /* ナビゲーションボタン */
+        .nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 25px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 8px;
+            user-select: none;
+            z-index: 10;
+        }
+
+        .nav-button:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        #prev-button {
+            left: -70px;
+        }
+
+        #next-button {
+            right: -70px;
+        }
+
+        /* ページ番号 */
+        #page-numbers {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 900px;
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        /* スマホ用のスタイル */
+        @media (max-width: 900px) {
+            #magazine {
+                width: 80vw;
+                height: 80vh;
+            }
+
+            .turn-page {
+                width: 80vw;
+                height: 80vh;
+            }
+
+            .nav-button {
+                width: 40px;
+                height: 70px;
+                font-size: 20px;
+            }
+
+            #prev-button {
+                left: -50px;
+            }
+
+            #next-button {
+                right: -50px;
+            }
+
+            #page-numbers {
+                width: 80vw;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="title">電子書籍</div>
+
+<div id="container">
+    <div id="prev-button" class="nav-button">←</div>
+
+    <div id="magazine">
+        <div class="turn-page" style="background-image:url('pages/01.jpg');"></div>
+        <div class="turn-page" style="background-image:url('pages/02.jpg');"></div>
+        <div class="turn-page" style="background-image:url('pages/03.jpg');"></div>
+        <div class="turn-page" style="background-image:url('pages/04.jpg');"></div>
+        <div class="turn-page" style="background-image:url('pages/05.jpg');"></div>
+        <div class="turn-page" style="background-image:url('pages/06.jpg');"></div>
+
+        <!-- 最終ページ -->
+        <div class="turn-page review-page">
+            <p>商品の感想を教えてください！</p>
+            <button class="review-button" onclick="window.location.href='https://digitarod.github.io/book/survey.html'">感想を書く</button>
+        </div>
+    </div>
+
+    <div id="next-button" class="nav-button">→</div>
+</div>
+
+<div id="page-numbers">
+    <span id="left-page">1</span>
+    <span id="right-page">2</span>
+</div>
+
+<script>
+    $(document).ready(function () {
+        function updateLayout() {
+            let isMobile = window.innerWidth < 900;
+
+            console.log("isMobile:", isMobile); // デバッグ用
+
+            if ($("#magazine").data("turn")) {
+                $("#magazine").turn("destroy"); // 再初期化前に破棄
+            }
+
+            $("#magazine").turn({
+                width: isMobile ? window.innerWidth * 0.8 : 900,
+                height: isMobile ? window.innerHeight * 0.8 : 700,
+                autoCenter: true,
+                display: isMobile ? "single" : "double",
+                gradients: true,
+                acceleration: true,
+                when: {
+                    turned: function (event, page, view) {
+                        updatePageNumbers(view);
+                    }
+                }
+            });
+
+            updatePageNumbers($("#magazine").turn("view"));
+        }
+
+        updateLayout();
+        $(window).resize(updateLayout);
+
+        $(document).keydown(function (e) {
+            if (e.keyCode === 37) $("#magazine").turn("previous");
+            else if (e.keyCode === 39) $("#magazine").turn("next");
+        });
+
+        $("#prev-button").click(function () { $("#magazine").turn("previous"); });
+        $("#next-button").click(function () { $("#magazine").turn("next"); });
+
+        function updatePageNumbers(view) {
+            if (!view) return;
+            $("#left-page").text(view[0] || "");
+            $("#right-page").text(view[1] || "");
+        }
+    });
+</script>
+
+</body>
+</html>
