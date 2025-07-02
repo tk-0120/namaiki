@@ -33,6 +33,7 @@ function setupTurnJs() {
         autoCenter: true,
         gradients: true,
         acceleration: true,
+        direction: 'rtl', // 右開きに変更
         when: {
             turned: (event, page, view) => updatePageNumbers(view),
         },
@@ -75,7 +76,7 @@ async function initializeViewer(password) {
         // イベント委譲でボタンのクリックを処理
         $magazine.on('click', '.review-button', function(event) {
             event.stopPropagation(); // turn.jsへのイベント伝播を停止
-            window.location.href = 'https://tk-0120.github.io/namaiki/survey.html';
+            window.location.href = 'https://tk-0120.github.io/namaiki/survay.html';
         });
 
         $loader.addClass('hidden');
