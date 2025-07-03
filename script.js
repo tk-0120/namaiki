@@ -105,12 +105,12 @@ $(window).on('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(setupTurnJs, 250);
 }).on('keydown', (e) => {
-    if (e.key === 'ArrowLeft') $magazine.turn('previous');
-    if (e.key === 'ArrowRight') $magazine.turn('next');
+    if (e.key === 'ArrowLeft') $magazine.turn('next');
+    if (e.key === 'ArrowRight') $magazine.turn('previous');
 });
 
-$('#prev-button').on('click', () => $magazine.turn('previous'));
-$('#next-button').on('click', () => $magazine.turn('next'));
+$('#prev-button').on('click', () => $magazine.turn('next'));
+$('#next-button').on('click', () => $magazine.turn('previous'));
 
 // --- Initialization ---
 const password = prompt('PDFのパスワードを入力してください:');
