@@ -23,8 +23,20 @@ function setupTurnJs() {
     }
     const isMobile = window.innerWidth < 900;
     const display = isMobile ? 'single' : 'double';
-    const width = isMobile ? window.innerWidth : 900;
-    const height = isMobile ? window.innerHeight : 600;
+    
+    let width, height;
+    if (isMobile) {
+        width = window.innerWidth;
+        height = window.innerHeight;
+    } else {
+        // 画像のアスペクト比 (幅 / 高さ)
+        const imageAspectRatio = 1666 / 2392;
+        // PC表示では高さを基準に、アスペクト比を保った幅を計算
+        // 表示領域の高さを画面の95%に設定
+        height = window.innerHeight * 0.95;
+        const singlePageWidth = height * imageAspectRatio;
+        width = singlePageWidth * 2;
+    }
 
     $magazine.turn({
         width: width,
