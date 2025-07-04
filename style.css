@@ -2,11 +2,11 @@ body {
     background: #e0f7fa; /* 爽やかな水色 */
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
-    overflow: hidden;
+    padding: 20px 0;
+    box-sizing: border-box;
 }
 
 #title {
