@@ -135,7 +135,15 @@ $('#prev-button').on('click', () => $magazine.turn('next'));
 $('#next-button').on('click', () => $magazine.turn('previous'));
 
 // --- Initialization ---
-const password = prompt('PDFのパスワードを入力してください:');
+let password = sessionStorage.getItem('pdfPassword');
+
+if (!password) {
+    password = prompt('PDFのパスワードを入力してください:');
+    if (password) {
+        sessionStorage.setItem('pdfPassword', password);
+    }
+}
+
 if (password) {
     initializeViewer(password);
 } else {
