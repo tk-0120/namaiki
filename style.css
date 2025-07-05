@@ -167,4 +167,14 @@ body {
         padding: 5px;
         border-radius: 5px;
     }
+
+    .button-container {
+        bottom: 12%;
+        right: 5%;
+    }
+
+    .final-button {
+        padding: 8px 15px;
+        font-size: 14px;
+    }
 }
