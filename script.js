@@ -87,19 +87,24 @@ async function initializeViewer(password) {
             $magazine.append($pageElement);
         }
 
-        const $reviewPage = $('<div>').addClass('review-page no-touch');
-        const $paragraph = $('<p>').text('商品の感想を教えてください！');
-        const $button = $('<button>')
-            .addClass('review-button')
-            .text('感想を書く'); // 直接イベントを割り当てない
-        $reviewPage.append($paragraph).append($button);
-        $magazine.append($reviewPage);
-
-        // イベント委譲でボタンのクリックを処理
-        $magazine.on('click', '.review-button', function(event) {
-            event.stopPropagation(); // turn.jsへのイベント伝播を停止
-            window.location.href = 'https://tk-0120.github.io/namaiki/survay.html';
+        const lastPageImageUrl = '生イキ ギャルを わからせる話.png';
+        const $lastPage = $('<div>').css({
+            'background-image': `url(${lastPageImageUrl})`,
+            'background-size': 'contain',
+            'background-position': 'center',
+            'background-repeat': 'no-repeat',
+            'position': 'relative'
         });
+
+        const $buttonContainer = $('<div>').addClass('button-container');
+        
+        const $button1 = $('<button>').addClass('final-button').text('ボタン1').on('click', () => window.location.href = '#');
+        const $button2 = $('<button>').addClass('final-button').text('ボタン2').on('click', () => window.location.href = '#');
+        const $button3 = $('<button>').addClass('final-button').text('ボタン3').on('click', () => window.location.href = '#');
+
+        $buttonContainer.append($button1, $button2, $button3);
+        $lastPage.append($buttonContainer);
+        $magazine.append($lastPage);
 
         $loader.addClass('hidden');
         $title.removeClass('hidden');
