@@ -23,19 +23,29 @@ function setupTurnJs() {
     }
     const isMobile = window.innerWidth < 900;
     const display = isMobile ? 'single' : 'double';
-    
+    const imageAspectRatio = 1666 / 2392;
+
     let width, height;
     if (isMobile) {
-        width = window.innerWidth;
-        height = window.innerHeight;
+        // スマホ表示: 画面に収まるように計算
+        const availableWidth = window.innerWidth;
+        const availableHeight = window.innerHeight;
+        
+        // 画面のアスペクト比と比較
+        if ((availableWidth / availableHeight) < imageAspectRatio) {
+            // 画面が縦長の場合、幅を基準にサイズを決める
+            width = availableWidth;
+            height = width / imageAspectRatio;
+        } else {
+            // 画面が横長の場合、高さを基準にサイズを決める
+            height = availableHeight;
+            width = height * imageAspectRatio;
+        }
     } else {
-        // 画像のアスペクト比 (幅 / 高さ)
-        const imageAspectRatio = 1666 / 2392;
-        // PC表示では高さを基準に、アスペクト比を保った幅を計算
-        // 表示領域の高さを画面の95%に設定
-        height = window.innerHeight * 0.95;
+        // PC表示: 高さを基準に計算
+        height = window.innerHeight * 0.95; // 画面の高さの95%
         const singlePageWidth = height * imageAspectRatio;
-        width = singlePageWidth * 2;
+        width = singlePageWidth * 2; // 見開きなので2倍
     }
 
     $magazine.turn({
