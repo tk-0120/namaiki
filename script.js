@@ -84,27 +84,25 @@ async function initializeViewer(password) {
         for (let i = 1; i <= pdf.numPages; i++) {
             const imageUrl = await renderPage(i);
             const $pageElement = $('<div>').css('background-image', `url(${imageUrl})`);
+
+            // 最終ページの場合、ボタンを追加
+            if (i === pdf.numPages) {
+                $pageElement.css('position', 'relative'); // ボタン配置の基準にする
+
+                const $buttonContainer = $('<div>').addClass('button-container');
+                
+                // ▼ ボタンのテキストとリンク先を編集 ▼
+                const $button1 = $('<button>').addClass('final-button').text('ボタン1').on('click', (e) => { e.stopPropagation(); window.location.href = '#'; }); // ボタン1のリンク先
+                const $button2 = $('<button>').addClass('final-button').text('ボタン2').on('click', (e) => { e.stopPropagation(); window.location.href = '#'; }); // ボタン2のリンク先
+                const $button3 = $('<button>').addClass('final-button').text('ボタン3').on('click', (e) => { e.stopPropagation(); window.location.href = '#'; }); // ボタン3のリンク先
+                // ▲ ボタンのテキストとリンク先を編集 ▲
+
+                $buttonContainer.append($button1, $button2, $button3);
+                $pageElement.append($buttonContainer);
+            }
+
             $magazine.append($pageElement);
         }
-
-        const lastPageImageUrl = '生イキ ギャルを わからせる話.png';
-        const $lastPage = $('<div>').css({
-            'background-image': `url(${lastPageImageUrl})`,
-            'background-size': 'contain',
-            'background-position': 'center',
-            'background-repeat': 'no-repeat',
-            'position': 'relative'
-        });
-
-        const $buttonContainer = $('<div>').addClass('button-container');
-        
-        const $button1 = $('<button>').addClass('final-button').text('ボタン1').on('click', () => window.location.href = '#');
-        const $button2 = $('<button>').addClass('final-button').text('ボタン2').on('click', () => window.location.href = '#');
-        const $button3 = $('<button>').addClass('final-button').text('ボタン3').on('click', () => window.location.href = '#');
-
-        $buttonContainer.append($button1, $button2, $button3);
-        $lastPage.append($buttonContainer);
-        $magazine.append($lastPage);
 
         $loader.addClass('hidden');
         $title.removeClass('hidden');
