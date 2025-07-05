@@ -49,46 +49,44 @@ body {
     font-weight: bold;
 }
 
-.review-page {
+/* --- Final Page Button Styles --- */
+.button-container {
+    position: absolute;
+    bottom: 5%; /* 星の位置に合わせて調整 */
+    right: 0%;  /* 星の位置に合わせて調整 */
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    background: #f8f8f8;
-    padding: 20px;
-    pointer-events: auto; /* クリックイベントを有効にする */
-    z-index: 999; /* 他の要素より手前に表示 */
+    flex-direction: column; /* ボタンを縦に並べる */
+    align-items: flex-end; /* 右揃えにする */
+    z-index: 100; /* ボタンを手前に表示 */
 }
 
-.review-button {
-    margin-top: 20px;
+.final-button {
+    margin-bottom: 22px;
     padding: 10px 20px;
-    font-size: 18px;
-    background: #007bff;
-    color: white;
+    font-size: 16px;     /* 文字の大きさ */
+    /* ▲ ボタンのサイズ（長さ・余白）を調整 ▲ */
+    width: 170px;  /* 幅を160pxに定義します。 */
+  	height: 40px;  /* 高さを36pxに定義します。 */
+
+    /* ▼ ボタンの色を調整 ▼ */
+    background-color: transparent; /* ボタンの背景色#ff69b4（transparentで透明） */
+    color: white;              /* 文字の色 */
+    /* ▲ ボタンの色を調整 ▲ */
+
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: background-color 0.3s, transform 0.2s;
     pointer-events: auto; /* クリックイベントを有効にする */
-    z-index: 1000; /* ボタンをさらに手前に */
 }
 
-.review-button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 18px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+.final-button:hover {
+    background-color: #ff1493; /* ディープピンク */
+    transform: translateY(-2px);
 }
 
-.review-button:hover {
-    background: #0056b3;
-}
-
+/* --- Navigation --- */
 .nav-button {
     position: absolute;
     top: 50%;
@@ -130,6 +128,7 @@ body {
     font-weight: bold;
 }
 
+/* --- Responsive Styles --- */
 @media (max-width: 900px) {
     #magazine {
         width: 100vw;
@@ -169,12 +168,16 @@ body {
     }
 
     .button-container {
+        /* ▼【スマホ用】ボタンの位置（座標）を調整 ▼ */
         bottom: 12%;
         right: 5%;
+        /* ▲【スマホ用】ボタンの位置（座標）を調整 ▲ */
     }
 
     .final-button {
+        /* ▼【スマホ用】ボタンのサイズ（長さ・余白）を調整 ▼ */
         padding: 8px 15px;
         font-size: 14px;
+        /* ▲【スマホ用】ボタンのサイズ（長さ・余白）を調整 ▲ */
     }
 }
