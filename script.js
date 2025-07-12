@@ -1,6 +1,8 @@
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
 const pdfUrl = 'https://tk-0120.github.io/namaiki/pdf/docpass.pdf';
+//const pdfUrl = 'https://digitarod.github.io/book/pdf/doc.pdf';
+
 
 // --- DOM Elements ---
 const $loader = $('#loader');
@@ -37,7 +39,7 @@ function setupTurnJs() {
             width = availableWidth;
             height = width / imageAspectRatio;
         } else {
-            // 画面が横長の場合、高さを基準にサイズを決める
+            // 画面が横長の場合、高さを基準に計算
             height = availableHeight;
             width = height * imageAspectRatio;
         }
@@ -115,7 +117,10 @@ async function initializeViewer(password) {
         $loader.addClass('hidden');
         $title.removeClass('hidden');
         let errorMessage = '不明なエラーが発生しました。';
-        if (err && err.message) {
+        if (err && err.name === 'PasswordException') {
+            errorMessage = 'パスワードが間違っています。再度入力してください。';
+            sessionStorage.removeItem('pdfPassword'); // 保存されたパスワードをクリア
+        } else if (err && err.message) {
             errorMessage = err.message;
         } else if (err && err.name) {
             errorMessage = `エラー種別: ${err.name}`;
