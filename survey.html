@@ -43,9 +43,9 @@
 </head>
 <body>
     <h1>今回の漫画の感想を送ってください</h1>
-  <form id="feedbackForm" method="POST" action="https://script.google.com/macros/s/AKfycbyuY9gQzl1v488hmZHr0QCdeYPu8nDLf3B5LTXql6YcYpqH_rU4rNadJB7_MwWERqrZlQ/exec" target="hidden_iframe" onsubmit="submitted=true;">
+  <form id="feedbackForm" method="POST" action="https://script.google.com/macros/s/AKfycby_g982F-jX671bjV52XUgbEMVCDJ47cDSnZREUS8PvAv4EcpYI3PzKseN38I0fT8lNUg/exec" target="hidden_iframe" onsubmit="submitted=true;">
     <textarea name="feedback" rows="5" cols="30" placeholder="ここに感想を書いてください..." required></textarea><br>
-    <button type="submit">送信</button>
+    <button type="submit" class="btn btn-custom mt-2">送信</button>
   </form>
 
   <iframe name="hidden_iframe" style="display:none;" onload="redirectIfSubmitted()"></iframe>
