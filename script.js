@@ -104,21 +104,21 @@ async function initializeViewer(password) {
             }
 
             $magazine.append($pageElement);
-
-            // ▼ イベント委譲でリンク処理
-            $magazine.on('click', '.button-amazon', function (event) {
-              event.stopPropagation();
-              window.open('https://www.amazon.co.jp', '_blank');
-            });
-            $magazine.on('click', '.button-survey1', function (event) {
-              event.stopPropagation();
-              window.open('https://tk-0120.github.io/namaiki/survey.html', '_blank');
-            });
-            $magazine.on('click', '.button-survey2', function (event) {
-              event.stopPropagation();
-              window.open('https://tk-0120.github.io/namaiki/survey.html', '_blank');
-            });
         }
+
+        // ▼ イベント委譲でリンク処理 (ループの外に移動)
+        $magazine.on('click', '.button-amazon', function (event) {
+          event.stopPropagation();
+          window.open('https://www.amazon.co.jp', '_blank');
+        });
+        $magazine.on('click', '.button-survey1', function (event) {
+          event.stopPropagation();
+          window.open('https://tk-0120.github.io/namaiki/survey.html', '_blank');
+        });
+        $magazine.on('click', '.button-survey2', function (event) {
+          event.stopPropagation();
+          window.open('https://tk-0120.github.io/namaiki/survey.html', '_blank');
+        });
 
         $loader.addClass('hidden');
         $title.removeClass('hidden');
@@ -156,18 +156,25 @@ $(window).on('resize', () => {
 $('#prev-button').on('click', () => $magazine.turn('next'));
 $('#next-button').on('click', () => $magazine.turn('previous'));
 
+const $passwordModal = $('#password-modal');
+const $passwordInput = $('#password-input');
+const $passwordSubmit = $('#password-submit');
+
 // --- Initialization ---
 let password = sessionStorage.getItem('pdfPassword');
 
 if (!password) {
-    password = prompt('PDFのパスワードを入力してください:');
-    if (password) {
-        sessionStorage.setItem('pdfPassword', password);
-    }
-}
-
-if (password) {
-    initializeViewer(password);
+    $passwordModal.removeClass('hidden');
+    $passwordSubmit.on('click', function() {
+        password = $passwordInput.val();
+        if (password) {
+            sessionStorage.setItem('pdfPassword', password);
+            $passwordModal.addClass('hidden');
+            initializeViewer(password);
+        } else {
+            alert('パスワードを入力してください。');
+        }
+    });
 } else {
-    $title.removeClass('hidden');
+    initializeViewer(password);
 }
