@@ -94,7 +94,7 @@ async function initializeViewer(password) {
                 const $buttonContainer = $('<div>').addClass('button-container');
                 
                 // ▼ ボタンのテキストとリンク先を編集 ▼
-                const $button1 = $('<button>').addClass('final-button').attr('href', 'https://www.amazon.co.jp').attr('target', '_blank').text('ボタン1'); // ボタン1のリンク先
+                const $button1 = $('<button>').addClass('final-button button-amazon').text('ボタン1'); // ボタン1のリンク先
                 const $button2 = $('<button>').addClass('final-button').text('ボタン2').on('click', (e) => {window.open('https://tk-0120.github.io/namaiki/survey.html', '_blank'); }); // ボタン2のリンク先
                 const $button3 = $('<button>').addClass('final-button').text('ボタン3').on('click', (e) => {window.open('https://tk-0120.github.io/namaiki/survey.html', '_blank'); }); // ボタン3のリンク先
                 // ▲ ボタンのテキストとリンク先を編集 ▲
@@ -104,6 +104,13 @@ async function initializeViewer(password) {
             }
 
             $magazine.append($pageElement);
+
+            // ▼ イベント委譲でリンク処理
+            $magazine.on('click', '.button-amazon', function (event) {
+              event.stopPropagation();
+              window.open('https://www.amazon.co.jp', '_blank');
+            });
+            
         }
 
         $loader.addClass('hidden');
