@@ -94,9 +94,9 @@ async function initializeViewer(password) {
                 const $buttonContainer = $('<div>').addClass('button-container');
                 
                 // ▼ ボタンのテキストとリンク先を編集 ▼
-                const $button1 = $('<button>').addClass('final-button').text('ボタン1').on('click', (e) => { e.stopPropagation(); window.location.href = '#'; }); // ボタン1のリンク先
-                const $button2 = $('<button>').addClass('final-button').text('ボタン2').on('click', (e) => { e.stopPropagation(); window.location.href = '#'; }); // ボタン2のリンク先
-                const $button3 = $('<button>').addClass('final-button').text('ボタン3').on('click', (e) => { e.stopPropagation(); window.location.href = '#'; }); // ボタン3のリンク先
+                const $button1 = $('<button>').addClass('final-button').text('ボタン1').on('click', (e) => { e.stopPropagation(); window.location.href = 'https://www.amazon.co.jp'; }); // ボタン1のリンク先
+                const $button2 = $('<button>').addClass('final-button').text('ボタン2').on('click', (e) => { e.stopPropagation(); window.location.href = 'https://tk-0120.github.io/namaiki/survey.html'; }); // ボタン2のリンク先
+                const $button3 = $('<button>').addClass('final-button').text('ボタン3').on('click', (e) => { e.stopPropagation(); window.location.href = 'https://tk-0120.github.io/namaiki/survey.html'; }); // ボタン3のリンク先
                 // ▲ ボタンのテキストとリンク先を編集 ▲
 
                 $buttonContainer.append($button1, $button2, $button3);
