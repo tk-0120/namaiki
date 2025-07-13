@@ -157,67 +157,44 @@ $('#prev-button').on('click', () => $magazine.turn('next'));
 $('#next-button').on('click', () => $magazine.turn('previous'));
 
 // --- Initialization ---
-let password = sessionStorage.getItem('pdfPassword');
+$(document).ready(() => {
+    const $passwordModal = $('#password-modal');
+    const $passwordInput = $('#password-input');
+    const $passwordSubmit = $('#password-submit');
 
-if (!password) {
-    const isMobile = window.innerWidth < 900;
-    if (isMobile) {
-        // For mobile, use the prompt as it was before and worked well.
-        password = prompt('PDFのパスワードを入力してください:');
-        if (password) {
-            sessionStorage.setItem('pdfPassword', password);
-            initializeViewer(password);
+    let password = sessionStorage.getItem('pdfPassword');
+
+    const showModal = () => {
+        $passwordModal.removeClass('hidden');
+        $passwordInput.focus();
+    };
+
+    const hideModal = () => {
+        $passwordModal.addClass('hidden');
+    };
+
+    const attemptLogin = () => {
+        const inputPassword = $passwordInput.val();
+        if (inputPassword) {
+            sessionStorage.setItem('pdfPassword', inputPassword);
+            hideModal();
+            initializeViewer(inputPassword);
         } else {
-            $title.removeClass('hidden');
+            alert('パスワードを入力してください。');
         }
+    };
+
+    if (password) {
+        initializeViewer(password);
     } else {
-        // For desktop, create and show a custom modal.
-        const $passwordModal = $('<div id="password-modal" class="modal"></div>');
-        const $modalContent = $('<div class="modal-content"></div>');
-        const $label = $('<label for="password-input">PDFのパスワードを入力してください:</label>');
-        const $input = $('<input type="password" id="password-input">');
-        const $button = $('<button id="password-submit">OK</button>');
-
-        $modalContent.append($label, $input, $button);
-        $passwordModal.append($modalContent);
-        $('body').append($passwordModal);
-
-        // Add styles dynamically
-        $('<style>')
-            .prop('type', 'text/css')
-            .html(`
-                .modal {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgba(0, 0, 0, 0.5);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 1000;
-                }
-                .modal-content {
-                    background-color: white;
-                    padding: 20px;
-                    border-radius: 5px;
-                    text-align: center;
-                }
-            `)
-            .appendTo('head');
-
-        $button.on('click', function() {
-            password = $input.val();
-            if (password) {
-                sessionStorage.setItem('pdfPassword', password);
-                $passwordModal.remove();
-                initializeViewer(password);
-            } else {
-                alert('パスワードを入力してください。');
-            }
-        });
+        showModal();
     }
-} else {
-    initializeViewer(password);
-}
+
+    $passwordSubmit.on('click', attemptLogin);
+
+    $passwordInput.on('keypress', (e) => {
+        if (e.key === 'Enter') {
+            attemptLogin();
+        }
+    });
+});
