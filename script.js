@@ -94,11 +94,11 @@ async function initializeViewer(password) {
                 const $buttonContainer = $('<div>').addClass('button-container');
                 
                 // ▼ ボタンのテキストとリンク先を編集 ▼
-                const $button1 = $('<button>').addClass('final-button').text('ボタン1').on('click', (e) => {window.open('https://www.amazon.co.jp', '_blank');}); // ボタン1のリンク先
+                const $button1 = $('<button>').addClass('final-button').attr('href', 'https://www.amazon.co.jp').attr('target', '_blank').text('ボタン1'); // ボタン1のリンク先
                 const $button2 = $('<button>').addClass('final-button').text('ボタン2').on('click', (e) => {window.open('https://tk-0120.github.io/namaiki/survey.html', '_blank'); }); // ボタン2のリンク先
                 const $button3 = $('<button>').addClass('final-button').text('ボタン3').on('click', (e) => {window.open('https://tk-0120.github.io/namaiki/survey.html', '_blank'); }); // ボタン3のリンク先
                 // ▲ ボタンのテキストとリンク先を編集 ▲
-
+                
                 $buttonContainer.append($button1, $button2, $button3);
                 $pageElement.append($buttonContainer);
             }
