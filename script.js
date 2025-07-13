@@ -95,8 +95,8 @@ async function initializeViewer(password) {
                 
                 // ▼ ボタンのテキストとリンク先を編集 ▼
                 const $button1 = $('<button>').addClass('final-button button-amazon').text('ボタン1'); // ボタン1のリンク先
-                const $button2 = $('<button>').addClass('final-button').text('ボタン2').on('click', (e) => {window.open('https://tk-0120.github.io/namaiki/survey.html', '_blank'); }); // ボタン2のリンク先
-                const $button3 = $('<button>').addClass('final-button').text('ボタン3').on('click', (e) => {window.open('https://tk-0120.github.io/namaiki/survey.html', '_blank'); }); // ボタン3のリンク先
+                const $button2 = $('<button>').addClass('final-button button-survey1').text('ボタン2');
+                const $button3 = $('<button>').addClass('final-button button-survey2').text('ボタン3');
                 // ▲ ボタンのテキストとリンク先を編集 ▲
                 
                 $buttonContainer.append($button1, $button2, $button3);
@@ -110,7 +110,14 @@ async function initializeViewer(password) {
               event.stopPropagation();
               window.open('https://www.amazon.co.jp', '_blank');
             });
-            
+            $magazine.on('click', '. button-survey1', function (event) {
+              event.stopPropagation();
+              window.open('https://tk-0120.github.io/namaiki/survey.html', '_blank');
+            });
+            $magazine.on('click', '. button-survey2', function (event) {
+              event.stopPropagation();
+              window.open('https://tk-0120.github.io/namaiki/survey.html', '_blank');
+            });
         }
 
         $loader.addClass('hidden');
