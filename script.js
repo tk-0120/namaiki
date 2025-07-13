@@ -158,7 +158,7 @@ $('#next-button').on('click', () => $magazine.turn('previous'));
 
 // --- Initialization ---
 $(document).ready(() => {
-    const $passwordModal = $('#password-modal');
+    const $passwordModal = $('#password-form-container');
     const $passwordInput = $('#password-input');
     const $passwordSubmit = $('#password-submit');
 
