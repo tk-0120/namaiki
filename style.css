@@ -6,7 +6,6 @@ body {
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    padding: 20px 0;
     box-sizing: border-box;
 }
 
@@ -200,10 +199,11 @@ body {
     background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* 上寄せに変更 */
     z-index: 1000;
-    padding: 20px;
+    padding: 40px 20px 20px; /* 上部に余白を追加 */
     box-sizing: border-box;
+    overflow-y: auto; /* コンテンツがはみ出た場合にスクロール */
 }
 
 .modal-content {
@@ -251,6 +251,10 @@ body {
 
 /* --- Modal Responsive Styles (Mobile) --- */
 @media screen and (max-width: 767px) {
+    .modal-container {
+        padding-top: 60px; /* モバイルでの上部余白を調整 */
+    }
+
     .modal-content {
         padding: 20px;
     }
