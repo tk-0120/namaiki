@@ -110,11 +110,11 @@ async function initializeViewer(password) {
               event.stopPropagation();
               window.open('https://www.amazon.co.jp', '_blank');
             });
-            $magazine.on('click', '. button-survey1', function (event) {
+            $magazine.on('click', '.button-survey1', function (event) {
               event.stopPropagation();
               window.open('https://tk-0120.github.io/namaiki/survey.html', '_blank');
             });
-            $magazine.on('click', '. button-survey2', function (event) {
+            $magazine.on('click', '.button-survey2', function (event) {
               event.stopPropagation();
               window.open('https://tk-0120.github.io/namaiki/survey.html', '_blank');
             });
