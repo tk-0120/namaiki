@@ -57,7 +57,7 @@ function setupTurnJs() {
         autoCenter: true,
         gradients: true,
         acceleration: true,
-        direction: 'rtl', // 右開きに変更
+        direction: 'ltr', // 右開きに変更
         when: {
             turned: (event, page, view) => updatePageNumbers(view),
         },
