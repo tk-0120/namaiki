@@ -1,36 +1,570 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Manga</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Manga Viewer</title>
+  <style>
+    :root {
+      --amazon-btn-width: 120px;
+      --amazon-btn-height: 40px;
+      --amazon-btn-bottom: 20px;
+      --amazon-btn-right: 20px;
+      --amazon-btn-gap: 10px;
+      --amazon-btn-font-size: 12px;
+      --amazon-btn-border-radius: 5px;
+      --nav-btn-size: 24px;
+      --nav-btn-padding: 30px 10px;
+      --nav-btn-offset: -20px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    #viewer-container {
+      position: relative;
+    }
+
+    #flipbook {
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    /* ▼▼▼【修正】ここから▼▼▼ */
+    /* ナビゲーションボタンを元に戻す */
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      font-size: var(--nav-btn-size);
+      padding: var(--nav-btn-padding);
+      cursor: pointer;
+      user-select: none;
+      border-radius: 50%;
+      z-index: 100;
+      opacity: 0;
+      transition: all 0.3s ease;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+    }
+
+    .nav-btn:hover {
+      background-color: rgba(0, 0, 0, 0.7);
+      transform: translateY(-50%) scale(1.1);
+    }
+    /* ▲▲▲【修正】ここまで▲▲▲ */
+
+    .nav-btn.visible { opacity: 1; }
+
+    #prevBtn { left: var(--nav-btn-offset); }
+    #nextBtn { right: var(--nav-btn-offset); }
+
+    .password-modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .password-form {
+      background-color: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      min-width: 300px;
+      max-width: 90%;
+      backdrop-filter: blur(10px);
+    }
+    .password-form h2 { margin-bottom: 20px; color: #333; font-size: 20px; }
+    .password-input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+    }
+    .password-input:focus {
+      outline: none;
+      border-color: #007BFF;
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    }
+    .password-btn {
+      background-color: #007BFF;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 5px;
+      transition: all 0.3s ease;
+    }
+    .password-btn:hover { background-color: #0056b3; transform: translateY(-1px); }
+    .password-error { color: #f44336; margin-top: 10px; display: none; font-size: 14px; }
+
+    .loading-screen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 500;
+    }
+    .loading-text { font-size: 24px; color: #333; margin-top: 20px; font-weight: 500; }
+    .loading-spinner {
+      width: 50px; height: 50px;
+      border: 4px solid #ddd;
+      border-top: 4px solid #007BFF;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .hidden { display: none !important; }
+
+    .amazon-buttons {
+      position: absolute;
+      bottom: var(--amazon-btn-bottom);
+      right: var(--amazon-btn-right);
+      display: flex;
+      flex-direction: column;
+      gap: var(--amazon-btn-gap);
+      z-index: 200;
+      opacity: 0;
+      transition: all 0.3s ease;
+      transform: translateY(10px);
+    }
+    .amazon-buttons.visible { opacity: 1; transform: translateY(0); }
+    
+    /* ▼▼▼【修正】ここから▼▼▼ */
+    /* 最終ページのボタンを透明にする */
+    .amazon-btn {
+      width: var(--amazon-btn-width);
+      height: var(--amazon-btn-height);
+      background-color: transparent;
+      color: transparent;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--amazon-btn-border-radius);
+      font-size: var(--amazon-btn-font-size);
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+    .amazon-btn:hover { 
+      background-color: transparent;
+      transform: none;
+      box-shadow: none;
+    }
+    .amazon-btn:active { transform: none; }
+    /* ▲▲▲【修正】ここまで▲▲▲ */
+
+    .page {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #fff;
+    }
+    .page img { width: 100%; height: 100%; object-fit: fill; display: block; }
+
+    .page-indicator {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 12px;
+      z-index: 150;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .page-indicator.visible { opacity: 1; }
+
+    @media (max-width: 767px) {
+      :root {
+        --amazon-btn-width: 150px; --amazon-btn-height: 48px; --amazon-btn-bottom: 44px; --amazon-btn-right: 15px;
+        --amazon-btn-gap: 18px; --amazon-btn-font-size: 10px; --nav-btn-size: 16px; --nav-btn-padding: 0;
+        --nav-btn-offset: 10px;
+      }
+      body { padding: 10px; }
+      /* ▼▼▼【最終修正】ここから▼▼▼ */
+      .nav-btn {
+        width: 40px;
+        height: 40px;
+        background-color: rgba(0, 0, 0, 0.3); /* 背景を30%の透明度に */
+      }
+      /* ▲▲▲【最終修正】ここまで▲▲▲ */
+      .password-form { padding: 25px; min-width: 280px; margin: 20px; }
+      .password-form h2 { font-size: 18px; }
+      .loading-text { font-size: 18px; }
+      .page-indicator { font-size: 11px; padding: 4px 8px; }
+      #flipbook { border-radius: 5px; }
+    }
+    
+    @media (min-width: 768px) and (max-width: 1023px) {
+     :root {
+        --amazon-btn-width: 160px; --amazon-btn-height: 50px; --amazon-btn-bottom: 50px; --amazon-btn-right: 20px;
+        --amazon-btn-gap: 20px; --amazon-btn-font-size: 11px; --nav-btn-size: 20px; --nav-btn-padding: 0;
+        --nav-btn-offset: -15px;
+      }
+      body { padding: 15px; }
+      .nav-btn { width: 45px; height: 45px; }
+    }
+    
+    @media (min-width: 1024px) {
+      :root {
+        --amazon-btn-width: 225px; --amazon-btn-height: 60px; --amazon-btn-bottom: 67px; --amazon-btn-right: 24px;
+        --amazon-btn-gap: 33px; --amazon-btn-font-size: 12px; --nav-btn-size: 18px; --nav-btn-padding: 0;
+        --nav-btn-offset: -25px;
+      }
+      body { padding: 20px; }
+      .nav-btn { width: 50px; height: 50px; }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/page-flip@2.0.3/dist/css/page-flip.min.css">
 </head>
 <body>
-    <div id="title">Free Manga</div>
-    <div id="loader" class="hidden">読み込み中...</div>
-    <div id="container" class="hidden">
-        <div id="prev-button" class="nav-button">←</div>
-        <div id="magazine"></div>
-        <div id="next-button" class="nav-button">→</div>
+  <div id="passwordModal" class="password-modal">
+    <div class="password-form">
+      <h2>パスワードを入力してください</h2>
+      <input type="password" id="passwordInput" class="password-input" placeholder="パスワードを入力">
+      <br>
+      <button id="submitPassword" class="password-btn">開く</button>
+      <div id="passwordError" class="password-error">パスワードが間違っています</div>
     </div>
-    <div id="page-numbers" class="hidden">
-        <span id="left-page"></span>
-        <span id="right-page"></span>
-    </div>
+  </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="turn.min.js"></script>
-    <script src="script.js"></script>
+  <div id="loadingScreen" class="loading-screen hidden">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">読み込み中...</div>
+  </div>
 
-    <!-- Password Form -->
-    <div id="password-form-container" class="hidden">
-        <div class="form-content">
-            <label for="password-input">PDFのパスワードを入力してください:</label>
-            <input type="password" id="password-input">
-            <button id="password-submit">OK</button>
-        </div>
+  <div id="viewer-container">
+    <div id="flipbook"></div>
+    <div id="prevBtn" class="nav-btn">◀</div>
+    <div id="nextBtn" class="nav-btn">▶</div>
+    <div id="pageIndicator" class="page-indicator">1 / 1</div>
+    <div class="amazon-buttons" id="amazonButtons">
+      <a href="https://www.amazon.co.jp/review/review-your-purchases/" target="_blank" class="amazon-btn">Amazon</a>
+      <a href="https://tk-0120.github.io/namaiki/survey.html" target="_blank" class="amazon-btn">感想</a>
+      <a href="https://tk-0120.github.io/namaiki/survey.html" target="_blank" class="amazon-btn">感想</a>
     </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.3/dist/js/page-flip.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+  <script>
+    const url = 'https://tk-0120.github.io/namaiki/pdf/docpass.pdf';
+    
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const viewerContainer = document.getElementById('viewer-container');
+    const flipbook = document.getElementById('flipbook');
+    const amazonButtons = document.getElementById('amazonButtons');
+    const passwordModal = document.getElementById('passwordModal');
+    const passwordInput = document.getElementById('passwordInput');
+    const submitPasswordBtn = document.getElementById('submitPassword');
+    const passwordError = document.getElementById('passwordError');
+    const loadingScreen = document.getElementById('loadingScreen');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const pageIndicator = document.getElementById('pageIndicator');
+
+    let pageFlip = null;
+    let pdfDocument = null;
+    let totalPages = 0;
+    let isMobile = false;
+    let isFlipping = false;
+    
+    // ▼▼▼【最終修正】ここから▼▼▼
+    let navButtonTimer; // スマホ用ボタンの自動非表示タイマー
+    // ▲▲▲【最終修正】ここまで▲▲▲
+
+    const detectDeviceType = () => {
+      isMobile = window.innerWidth <= 600; 
+      console.log(`Device type: ${isMobile ? 'Mobile' : 'Desktop/Tablet'}`);
+    };
+
+    const showLoading = (show) => {
+      loadingScreen.classList.toggle('hidden', !show);
+      if(show) {
+        [prevBtn, nextBtn, amazonButtons, pageIndicator].forEach(el => el.classList.remove('visible'));
+      }
+    };
+
+    // ▼▼▼【最終修正】ここから▼▼▼
+    const showAndAutoHideNavButtons = () => {
+        // スマホでなければ何もしない
+        if (!isMobile) return;
+
+        // 既存のタイマーをクリア
+        clearTimeout(navButtonTimer);
+        
+        // ボタンを表示
+        prevBtn.classList.add('visible');
+        nextBtn.classList.add('visible');
+        
+        // 3秒後にボタンを非表示にする
+        navButtonTimer = setTimeout(() => {
+            prevBtn.classList.remove('visible');
+            nextBtn.classList.remove('visible');
+        }, 3000);
+    };
+    // ▲▲▲【最終修正】ここまで▲▲▲
+
+    const updatePageIndicator = () => {
+      if (!pageFlip || totalPages === 0) return;
+      const current = pageFlip.getCurrentPageIndex();
+      let displayPageIndex, displayTotalPages;
+      const pageNum = totalPages - current;
+      if (isMobile) {
+        displayPageIndex = pageNum;
+        displayTotalPages = totalPages;
+      } else {
+        displayTotalPages = 1 + Math.ceil((totalPages - 1) / 2);
+        displayPageIndex = (current === totalPages - 1) ? 1 : 1 + Math.ceil((totalPages - 1 - current) / 2);
+      }
+      pageIndicator.textContent = `${displayPageIndex} / ${displayTotalPages}`;
+      pageIndicator.classList.add('visible');
+      setTimeout(() => pageIndicator.classList.remove('visible'), 3000);
+    };
+
+    const loadPDFWithPassword = async (password = '') => {
+      showLoading(true);
+      passwordError.style.display = 'none';
+      try {
+        pdfDocument = await pdfjsLib.getDocument({ url, password }).promise;
+        if (password) {
+            sessionStorage.setItem('pdfPassword', password);
+        }
+        passwordModal.style.display = 'none';
+        await updateViewerSize();
+      } catch (error) {
+        passwordModal.style.display = 'flex';
+        if (error.name === 'PasswordException') {
+          sessionStorage.removeItem('pdfPassword');
+          // ▼▼▼【修正】ここから▼▼▼
+          if (password) {
+            passwordError.textContent = 'パスワードが間違っています';
+            passwordError.style.display = 'block';
+          } else {
+            passwordError.style.display = 'none'; // パスワードが空ならメッセージ非表示
+          }
+          // ▲▲▲【修正】ここまで▲▲▲
+          passwordInput.value = '';
+          passwordInput.focus();
+        } else {
+          console.error('PDF loading error:', error);
+          passwordError.textContent = `PDFの読み込みに失敗しました: ${error.message}`;
+          passwordError.style.display = 'block';
+        }
+      } finally {
+        showLoading(false);
+      }
+    };
+
+    const calculateOptimalViewerSize = () => {
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        const padding = isMobile ? 20 : 60;
+        const availableWidth = windowWidth - padding;
+        const availableHeight = windowHeight - padding;
+        const aspectRatio = 1 / 1.414;
+        let viewerWidth, viewerHeight, pageWidth, pageHeight;
+        if (isMobile) {
+            if ((availableWidth / availableHeight) > aspectRatio) {
+                viewerHeight = availableHeight * 0.95;
+                viewerWidth = viewerHeight * aspectRatio;
+            } else {
+                viewerWidth = availableWidth * 0.95;
+                viewerHeight = viewerWidth / aspectRatio;
+            }
+            pageWidth = viewerWidth;
+            pageHeight = viewerHeight;
+        } else {
+            const spreadRatio = 2 * aspectRatio;
+            if ((availableWidth / availableHeight) > spreadRatio) {
+                viewerHeight = availableHeight * 0.9;
+                viewerWidth = viewerHeight * spreadRatio;
+            } else {
+                viewerWidth = availableWidth * 0.9;
+                viewerHeight = viewerWidth / spreadRatio;
+            }
+            pageWidth = viewerWidth / 2;
+            pageHeight = viewerHeight;
+        }
+        return {
+            width: Math.round(viewerWidth), height: Math.round(viewerHeight),
+            pageWidth: Math.round(pageWidth), pageHeight: Math.round(pageHeight)
+        };
+    };
+
+    const renderAndInitPageFlip = async (pdf, dimensions) => {
+      showLoading(true);
+      totalPages = pdf.numPages;
+      const pages = [];
+      const renderScale = Math.min(window.devicePixelRatio || 1, 2);
+      const firstPage = await pdf.getPage(1);
+      const viewport = firstPage.getViewport({ scale: 1 });
+      const scale = dimensions.pageHeight / viewport.height;
+      for (let i = 1; i <= totalPages; i++) {
+        const page = await pdf.getPage(i);
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        const scaledViewport = page.getViewport({ scale: scale * renderScale });
+        canvas.width = scaledViewport.width; canvas.height = scaledViewport.height;
+        canvas.style.width = `${scaledViewport.width / renderScale}px`;
+        canvas.style.height = `${scaledViewport.height / renderScale}px`;
+        await page.render({ canvasContext: context, viewport: scaledViewport }).promise;
+        const img = new Image();
+        img.src = canvas.toDataURL('image/jpeg', 0.92);
+        pages.push(img);
+      }
+      const pageElements = pages.map(img => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'page';
+        wrapper.appendChild(img);
+        return wrapper;
+      });
+      if (pageFlip) pageFlip.destroy();
+      
+      let flipConfig;
+      pageElements.reverse(); 
+
+      if (isMobile) {
+        flipConfig = {
+            width: dimensions.pageWidth, height: dimensions.pageHeight,
+            usePortrait: true, 
+            direction: 'ltr',
+            showCover: false, size: 'fixed', autoSize: false, maxShadowOpacity: 0.3,
+            flippingTime: 600, showPageCorners: false,
+        };
+      } else {
+        flipConfig = {
+            width: dimensions.pageWidth, height: dimensions.pageHeight,
+            usePortrait: false, direction: 'ltr', showCover: true,
+            size: 'fixed', autoSize: false, maxShadowOpacity: 0.5,
+            flippingTime: 800, useMouseEvents: true,
+        };
+      }
+
+      pageFlip = new St.PageFlip(flipbook, flipConfig);
+      pageFlip.loadFromHTML(pageElements);
+      
+      pageFlip.turnToPage(pageElements.length - 1);
+
+      // ▼▼▼【最終修正】ここから▼▼▼
+      if (isMobile) {
+          showAndAutoHideNavButtons(); // 初期表示
+      } else {
+          prevBtn.classList.add('visible'); // PCでは常時表示
+          nextBtn.classList.add('visible');
+      }
+      // ▲▲▲【最終修正】ここまで▲▲▲
+      
+      updatePageIndicator();
+      checkIfLastPage();
+
+      pageFlip.on('flip', () => {
+        isFlipping = false;
+        updatePageIndicator();
+        checkIfLastPage();
+        // ▼▼▼【最終修正】ここから▼▼▼
+        if(isMobile) showAndAutoHideNavButtons(); // ページめくり時にもタイマーをリセット
+        // ▲▲▲【最終修正】ここまで▲▲▲
+      });
+      pageFlip.on('flipStart', () => isFlipping = true);
+      showLoading(false);
+    };
+
+    const checkIfLastPage = () => {
+      if (!pageFlip) return;
+      const isLast = pageFlip.getCurrentPageIndex() === 0;
+      amazonButtons.classList.toggle('visible', isLast);
+    };
+    
+    const updateViewerSize = async () => {
+      if (!pdfDocument) return;
+      detectDeviceType();
+      const dimensions = calculateOptimalViewerSize();
+      viewerContainer.style.width = `${dimensions.width}px`;
+      viewerContainer.style.height = `${dimensions.height}px`;
+      flipbook.style.width = `${dimensions.width}px`;
+      flipbook.style.height = `${dimensions.height}px`;
+      await renderAndInitPageFlip(pdfDocument, dimensions);
+    };
+
+    prevBtn.addEventListener('click', () => {
+      pageFlip?.flipPrev();
+    });
+    nextBtn.addEventListener('click', () => {
+      pageFlip?.flipNext();
+    });
+    
+    submitPasswordBtn.addEventListener('click', () => loadPDFWithPassword(passwordInput.value));
+    passwordInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') loadPDFWithPassword(passwordInput.value);
+    });
+    
+    document.addEventListener('keydown', (e) => {
+      if (!pageFlip || isFlipping) return;
+      if (e.key === 'ArrowLeft') pageFlip.flipPrev();
+      else if (e.key === 'ArrowRight') pageFlip.flipNext();
+    });
+    document.addEventListener('wheel', (e) => {
+      if (!pageFlip || isFlipping) return;
+      e.preventDefault();
+      if (e.deltaY < 0) pageFlip.flipPrev();
+      else pageFlip.flipNext();
+    }, { passive: false });
+    
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(updateViewerSize, 250);
+    });
+
+    const init = async () => {
+      detectDeviceType();
+      const savedPassword = sessionStorage.getItem('pdfPassword') || '';
+      await loadPDFWithPassword(savedPassword);
+    };
+
+    init();
+  </script>
 </body>
 </html>
