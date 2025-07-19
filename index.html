@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>PDF Viewer with PageFlip - 完成版</title>
+  <title>Manga Viewer</title>
   <style>
     :root {
       --amazon-btn-width: 120px;
@@ -309,6 +309,10 @@
     let totalPages = 0;
     let isMobile = false;
     let isFlipping = false;
+    
+    // ▼▼▼【最終修正】ここから▼▼▼
+    let navButtonTimer; // スマホ用ボタンの自動非表示タイマー
+    // ▲▲▲【最終修正】ここまで▲▲▲
 
     const detectDeviceType = () => {
       isMobile = window.innerWidth <= 600; 
@@ -322,12 +326,25 @@
       }
     };
 
-    const updateNavButtonsVisibility = () => {
-      if (pageFlip) {
+    // ▼▼▼【最終修正】ここから▼▼▼
+    const showAndAutoHideNavButtons = () => {
+        // スマホでなければ何もしない
+        if (!isMobile) return;
+
+        // 既存のタイマーをクリア
+        clearTimeout(navButtonTimer);
+        
+        // ボタンを表示
         prevBtn.classList.add('visible');
         nextBtn.classList.add('visible');
-      }
+        
+        // 3秒後にボタンを非表示にする
+        navButtonTimer = setTimeout(() => {
+            prevBtn.classList.remove('visible');
+            nextBtn.classList.remove('visible');
+        }, 3000);
     };
+    // ▲▲▲【最終修正】ここまで▲▲▲
 
     const updatePageIndicator = () => {
       if (!pageFlip || totalPages === 0) return;
@@ -470,7 +487,15 @@
       
       pageFlip.turnToPage(pageElements.length - 1);
 
-      updateNavButtonsVisibility();
+      // ▼▼▼【最終修正】ここから▼▼▼
+      if (isMobile) {
+          showAndAutoHideNavButtons(); // 初期表示
+      } else {
+          prevBtn.classList.add('visible'); // PCでは常時表示
+          nextBtn.classList.add('visible');
+      }
+      // ▲▲▲【最終修正】ここまで▲▲▲
+      
       updatePageIndicator();
       checkIfLastPage();
 
@@ -478,6 +503,9 @@
         isFlipping = false;
         updatePageIndicator();
         checkIfLastPage();
+        // ▼▼▼【最終修正】ここから▼▼▼
+        if(isMobile) showAndAutoHideNavButtons(); // ページめくり時にもタイマーをリセット
+        // ▲▲▲【最終修正】ここまで▲▲▲
       });
       pageFlip.on('flipStart', () => isFlipping = true);
       showLoading(false);
