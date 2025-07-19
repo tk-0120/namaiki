@@ -213,14 +213,20 @@
     }
     .page-indicator.visible { opacity: 1; }
 
-    @media (max-width: 600px) {
+    @media (max-width: 767px) {
       :root {
         --amazon-btn-width: 150px; --amazon-btn-height: 48px; --amazon-btn-bottom: 44px; --amazon-btn-right: 15px;
         --amazon-btn-gap: 18px; --amazon-btn-font-size: 10px; --nav-btn-size: 16px; --nav-btn-padding: 0;
         --nav-btn-offset: 10px;
       }
       body { padding: 10px; }
-      .nav-btn { width: 40px; height: 40px; }
+      /* ▼▼▼【最終修正】ここから▼▼▼ */
+      .nav-btn {
+        width: 40px;
+        height: 40px;
+        background-color: rgba(0, 0, 0, 0.3); /* 背景を30%の透明度に */
+      }
+      /* ▲▲▲【最終修正】ここまで▲▲▲ */
       .password-form { padding: 25px; min-width: 280px; margin: 20px; }
       .password-form h2 { font-size: 18px; }
       .loading-text { font-size: 18px; }
@@ -228,7 +234,7 @@
       #flipbook { border-radius: 5px; }
     }
     
-    @media (min-width: 601px) and (max-width: 1024px) {
+    @media (min-width: 768px) and (max-width: 1023px) {
      :root {
         --amazon-btn-width: 160px; --amazon-btn-height: 50px; --amazon-btn-bottom: 50px; --amazon-btn-right: 20px;
         --amazon-btn-gap: 20px; --amazon-btn-font-size: 11px; --nav-btn-size: 20px; --nav-btn-padding: 0;
@@ -238,7 +244,7 @@
       .nav-btn { width: 45px; height: 45px; }
     }
     
-    @media (min-width: 1025px) {
+    @media (min-width: 1024px) {
       :root {
         --amazon-btn-width: 225px; --amazon-btn-height: 60px; --amazon-btn-bottom: 67px; --amazon-btn-right: 24px;
         --amazon-btn-gap: 33px; --amazon-btn-font-size: 12px; --nav-btn-size: 18px; --nav-btn-padding: 0;
