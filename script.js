@@ -1,8 +1,10 @@
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-const pdfUrl = 'https://tk-0120.github.io/namaiki/pdf/freemanga.pdf';
-//const pdfUrl = 'https://digitarod.github.io/book/pdf/doc.pdf';
-
+const pdfUrls = [
+    'pdf/freemanga1.pdf',
+    'pdf/freemanga2.pdf',
+    'pdf/freemanga3.pdf'
+];
 
 // --- DOM Elements ---
 const $loader = $('#loader');
@@ -70,40 +72,43 @@ async function initializeViewer(password) {
     $title.addClass('hidden');
 
     try {
-        const pdf = await pdfjsLib.getDocument({ url: pdfUrl, password: password }).promise;
+        for (let pdfIndex = 0; pdfIndex < pdfUrls.length; pdfIndex++) {
+            const pdfUrl = pdfUrls[pdfIndex];
+            const pdf = await pdfjsLib.getDocument({ url: pdfUrl, password: password }).promise;
 
-        const renderPage = async (pageNumber) => {
-            const page = await pdf.getPage(pageNumber);
-            const viewport = page.getViewport({ scale: 2.0 });
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-            await page.render({ canvasContext: context, viewport: viewport }).promise;
-            return canvas.toDataURL('image/jpeg');
-        };
+            const renderPage = async (pageNumber) => {
+                const page = await pdf.getPage(pageNumber);
+                const viewport = page.getViewport({ scale: 2.0 });
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
+                return canvas.toDataURL('image/jpeg');
+            };
 
-        for (let i = 1; i <= pdf.numPages; i++) {
-            const imageUrl = await renderPage(i);
-            const $pageElement = $('<div>').css('background-image', `url(${imageUrl})`);
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const imageUrl = await renderPage(i);
+                const $pageElement = $('<div>').css('background-image', `url(${imageUrl})`);
 
-            // 最終ページの場合、ボタンを追加
-            if (i === pdf.numPages) {
-                $pageElement.css('position', 'relative'); // ボタン配置の基準にする
+                // 最終PDFの最終ページの場合、ボタンを追加
+                if (pdfIndex === pdfUrls.length - 1 && i === pdf.numPages) {
+                    $pageElement.css('position', 'relative'); // ボタン配置の基準にする
 
-                const $buttonContainer = $('<div>').addClass('button-container');
-                
-                // ▼ ボタンのテキストとリンク先を編集 ▼
-                const $button1 = $('<button>').addClass('final-button button-amazon').text('ボタン1'); // ボタン1のリンク先
-                const $button2 = $('<button>').addClass('final-button button-survey1').text('ボタン2');
-                const $button3 = $('<button>').addClass('final-button button-survey2').text('ボタン3');
-                // ▲ ボタンのテキストとリンク先を編集 ▲
-                
-                $buttonContainer.append($button1, $button2, $button3);
-                $pageElement.append($buttonContainer);
+                    const $buttonContainer = $('<div>').addClass('button-container');
+                    
+                    // ▼ ボタンのテキストとリンク先を編集 ▼
+                    const $button1 = $('<button>').addClass('final-button button-amazon').text('ボタン1'); // ボタン1のリンク先
+                    const $button2 = $('<button>').addClass('final-button button-survey1').text('ボタン2');
+                    const $button3 = $('<button>').addClass('final-button button-survey2').text('ボタン3');
+                    // ▲ ボタンのテキストとリンク先を編集 ▲
+                    
+                    $buttonContainer.append($button1, $button2, $button3);
+                    $pageElement.append($buttonContainer);
+                }
+
+                $magazine.append($pageElement);
             }
-
-            $magazine.append($pageElement);
         }
 
         // ▼ イベント委譲でリンク処理 (ループの外に移動)
@@ -139,7 +144,9 @@ async function initializeViewer(password) {
         } else if (err && err.name) {
             errorMessage = `エラー種別: ${err.name}`;
         }
-        alert(`PDFの読み込みに失敗しました。\n\n理由: ${errorMessage}`);
+        alert(`PDFの読み込みに失敗しました。
+
+理由: ${errorMessage}`);
     }
 }
 
