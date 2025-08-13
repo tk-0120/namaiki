@@ -33,6 +33,7 @@
 
     #viewer-container {
       position: relative;
+      transition: opacity 0.3s ease;
     }
 
     #flipbook {
@@ -515,14 +516,19 @@
       
       pageFlip.turnToPage(pageElements.length - 1);
 
-      // ▼▼▼【最終修正】ここから▼▼▼
+      // スマホの場合は少し待ってから表示を確実にする
       if (isMobile) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        // 強制的に再描画
+        viewerContainer.style.opacity = '0';
+        setTimeout(() => {
+          viewerContainer.style.opacity = '1';
           showAndAutoHideNavButtons(); // 初期表示
+        }, 50);
       } else {
-          prevBtn.classList.add('visible'); // PCでは常時表示
-          nextBtn.classList.add('visible');
+        prevBtn.classList.add('visible'); // PCでは常時表示
+        nextBtn.classList.add('visible');
       }
-      // ▲▲▲【最終修正】ここまで▲▲▲
       
       updatePageIndicator();
       checkIfLastPage();
