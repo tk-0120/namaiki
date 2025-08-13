@@ -293,7 +293,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
   <script>
-    const url = 'https://drive.google.com/file/d/1oNDKh9loJrjOUoibYcT6pltnnbB1lK0y/view?usp=sharing';
+    const pdfUrls = [
+      'https://tk-0120.github.io/namaiki/pdf/freemanga1.pdf',
+      'https://tk-0120.github.io/namaiki/pdf/freemanga2.pdf',
+      'https://tk-0120.github.io/namaiki/pdf/freemanga3.pdf'
+    ];
     
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -310,7 +314,7 @@
     const pageIndicator = document.getElementById('pageIndicator');
 
     let pageFlip = null;
-    let pdfDocument = null;
+    let pdfDocuments = [];
     let totalPages = 0;
     let isMobile = false;
     let isFlipping = false;
@@ -368,11 +372,15 @@
       setTimeout(() => pageIndicator.classList.remove('visible'), 3000);
     };
 
-    const loadPDFWithPassword = async (password = '') => {
+    const loadPDFsWithPassword = async (password = '') => {
       showLoading(true);
       passwordError.style.display = 'none';
       try {
-        pdfDocument = await pdfjsLib.getDocument({ url, password }).promise;
+        pdfDocuments = [];
+        for (const url of pdfUrls) {
+          const pdf = await pdfjsLib.getDocument({ url, password }).promise;
+          pdfDocuments.push(pdf);
+        }
         if (password) {
             sessionStorage.setItem('pdfPassword', password);
         }
@@ -380,6 +388,7 @@
         await updateViewerSize();
       } catch (error) {
         passwordModal.style.display = 'flex';
+        pdfDocuments = [];
         if (error.name === 'PasswordException') {
           sessionStorage.removeItem('pdfPassword');
           // ▼▼▼【修正】ここから▼▼▼
@@ -438,33 +447,47 @@
         };
     };
 
-    const renderAndInitPageFlip = async (pdf, dimensions) => {
+    const renderAndInitPageFlip = async (pdfDocs, dimensions) => {
       showLoading(true);
-      totalPages = pdf.numPages;
-      const pages = [];
+      totalPages = 0;
+      const allPages = [];
       const renderScale = Math.min(window.devicePixelRatio || 1, 2);
-      const firstPage = await pdf.getPage(1);
+      
+      // 各PDFの総ページ数を計算
+      for (const pdf of pdfDocs) {
+        totalPages += pdf.numPages;
+      }
+      
+      const firstPdf = pdfDocs[0];
+      const firstPage = await firstPdf.getPage(1);
       const viewport = firstPage.getViewport({ scale: 1 });
       const scale = dimensions.pageHeight / viewport.height;
-      for (let i = 1; i <= totalPages; i++) {
-        const page = await pdf.getPage(i);
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        const scaledViewport = page.getViewport({ scale: scale * renderScale });
-        canvas.width = scaledViewport.width; canvas.height = scaledViewport.height;
-        canvas.style.width = `${scaledViewport.width / renderScale}px`;
-        canvas.style.height = `${scaledViewport.height / renderScale}px`;
-        await page.render({ canvasContext: context, viewport: scaledViewport }).promise;
-        const img = new Image();
-        img.src = canvas.toDataURL('image/jpeg', 0.92);
-        pages.push(img);
+      
+      // 全てのPDFからページを順番に処理
+      for (const pdf of pdfDocs) {
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          const scaledViewport = page.getViewport({ scale: scale * renderScale });
+          canvas.width = scaledViewport.width; 
+          canvas.height = scaledViewport.height;
+          canvas.style.width = `${scaledViewport.width / renderScale}px`;
+          canvas.style.height = `${scaledViewport.height / renderScale}px`;
+          await page.render({ canvasContext: context, viewport: scaledViewport }).promise;
+          const img = new Image();
+          img.src = canvas.toDataURL('image/jpeg', 0.92);
+          allPages.push(img);
+        }
       }
-      const pageElements = pages.map(img => {
+      
+      const pageElements = allPages.map(img => {
         const wrapper = document.createElement('div');
         wrapper.className = 'page';
         wrapper.appendChild(img);
         return wrapper;
       });
+      
       if (pageFlip) pageFlip.destroy();
       
       let flipConfig;
@@ -523,14 +546,14 @@
     };
     
     const updateViewerSize = async () => {
-      if (!pdfDocument) return;
+      if (pdfDocuments.length === 0) return;
       detectDeviceType();
       const dimensions = calculateOptimalViewerSize();
       viewerContainer.style.width = `${dimensions.width}px`;
       viewerContainer.style.height = `${dimensions.height}px`;
       flipbook.style.width = `${dimensions.width}px`;
       flipbook.style.height = `${dimensions.height}px`;
-      await renderAndInitPageFlip(pdfDocument, dimensions);
+      await renderAndInitPageFlip(pdfDocuments, dimensions);
     };
 
     prevBtn.addEventListener('click', () => {
@@ -540,9 +563,9 @@
       pageFlip?.flipNext();
     });
     
-    submitPasswordBtn.addEventListener('click', () => loadPDFWithPassword(passwordInput.value));
+    submitPasswordBtn.addEventListener('click', () => loadPDFsWithPassword(passwordInput.value));
     passwordInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') loadPDFWithPassword(passwordInput.value);
+      if (e.key === 'Enter') loadPDFsWithPassword(passwordInput.value);
     });
     
     document.addEventListener('keydown', (e) => {
@@ -566,7 +589,7 @@
     const init = async () => {
       detectDeviceType();
       const savedPassword = sessionStorage.getItem('pdfPassword') || '';
-      await loadPDFWithPassword(savedPassword);
+      await loadPDFsWithPassword(savedPassword);
     };
 
     init();
